@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>World Map</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+
+<body>
+    <div id="map-container"></div>
+    <script>
+        const svg = d3.select("#map-container")
+            .append("svg")
+            .attr("width", 500)
+            .attr("height", 100);
+        svg
+            .append('circle')
+            .attr('cx', '50%')
+            .attr('cy', '50%')
+            .attr('r', 20)
+            .style('fill', 'green');
+
+    
+    </script>
+
+</body>
+
+</html>

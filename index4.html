@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>World Map</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        .country {
+            stroke: lightblue;
+            stroke-width: 0.75px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map-container"></div>
+    <script>
+        const svg = d3.select("#map-container")
+            .append("svg")
+            .attr("width", 1000)
+            .attr("height", 800);
+
+        // URL of the GeoJSON file
+        const geojsonUrl = "https://data.opendatasoft.com/api/explore/v2.1/catalog/datasets/natural-earth-countries-1_110m@public/exports/geojson?lang=en&timezone=Europe%2FBerlin";
+
+        // Load the GeoJSON data
+        d3.json(geojsonUrl)
+            .then((geojsonData) => {
+                let projection = d3.geoEquirectangular(); // decide on the projection to use for turning Long/Lat into X,Y
+                let geoGenerator = d3.geoPath()
+                    .projection(projection); // a function to turn the GeoJSON (long/lat) features property into SVG (X,Y) path definition  
+
+                const populationDomain = d3.extent(geojsonData.features, (d) => d.properties.pop_est)
+                const colorScale = d3.scaleDiverging(d3.interpolateRdYlBu).domain(populationDomain)
+
+                let mapNodes = svg
+                    .selectAll('path')
+                    .data(geojsonData.features)
+                    .join('path')
+                    .attr('d', geoGenerator)
+                    .style('fill', (d) => colorScale(d.properties.pop_est))
+                    .attr('class', 'country') // set a CSS class on every country 
+                    .append('title')
+                    .text(
+                        (d) => `${d.properties.name} (estimated population size: ${Math.floor(d.properties.pop_est / 1000000)}M)`)
+
+
+                    ;
+            })
+            .catch((error) => {
+                console.error("Error loading the GeoJSON data: ", error);
+            });
+    </script>
+
+</body>
+
+</html>
